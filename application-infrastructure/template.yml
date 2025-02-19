@@ -170,6 +170,11 @@ Parameters:
     Default: 128
     AllowedValues: [128, 192, 256, 320, 384, 448, 512]
     ConstraintDescription: "Min 128, Max 512 in increments of 64"
+  FunctionArchitecture:
+    Type: String
+    Description: "The instruction set architecture for the Lambda function. Lambda functions support x86_64 and arm64 architectures. arm64 has better processing than default x86_64 - but the layers and binaries you use must support it."
+    Default: "arm64"
+    AllowedValues: ["x86_64", "arm64"]
 
   # ---------------------------------------------------------------------------
   # Application Settings
@@ -193,6 +198,77 @@ Parameters:
     Default: 7
     AllowedValues: [1, 3, 5, 7, 14, 30, 60, 90, 120, 150, 180, 365, 400, 545, 731, 1827, 3653]
 
+# =============================================================================
+# MAPPINGS
+# -----------------------------------------------------------------------------
+# https://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/mappings-section-structure.html
+#
+Mappings:
+  LambdaInsightsAccountId:
+    us-east-1:
+      AccountId: "580247275435"
+    us-east-2:
+      AccountId: "580247275435"
+    us-west-1:
+      AccountId: "580247275435"
+    us-west-2:
+      AccountId: "580247275435"
+    # Add more regions as needed
+    # https://docs.aws.amazon.com/AmazonCloudWatch/latest/monitoring/Lambda-Insights-extension-versions.html
+    # These accounts and layers are AWS Managed so you can trust them - They are not some random accounts
+
+  LambdaInsightsVersion:
+    us-east-1:
+      Ver: "55"
+    us-east-2:
+      Ver: "55"
+    us-west-1:
+      Ver: "55"
+    us-west-2:
+      Ver: "55"
+
+  LambdaInsightsArmVersion:
+    us-east-1:
+      Ver: "22"
+    us-east-2:
+      Ver: "24"
+    us-west-1:
+      Ver: "20"
+    us-west-2:
+      Ver: "22"
+
+  LambdaParamSecretsAccountId:
+    us-east-1:
+      AccountId: "177933569100"
+    us-east-2:
+      AccountId: "590474943231"
+    us-west-1:
+      AccountId: "997803712105"
+    us-west-2:
+      AccountId: "345057560386"
+    # Add more regions as needed
+    # https://docs.aws.amazon.com/systems-manager/latest/userguide/ps-integration-lambda-extensions.html#ps-integration-lambda-extensions-add
+    # These accounts and layers are AWS Managed so you can trust them - They are not some random accounts
+
+  LambdaParamSecretsVersion:
+    us-east-1:
+      Ver: "14"
+    us-east-2:
+      Ver: "12"
+    us-west-1:
+      Ver: "12"
+    us-west-2:
+      Ver: "12"
+
+  LambdaParamSecretsArmVersion:
+    us-east-1:
+      Ver: "14"
+    us-east-2:
+      Ver: "12"
+    us-west-1:
+      Ver: "9"
+    us-west-2:
+      Ver: "12"
 
 # =============================================================================
 # CONDITIONS
@@ -211,6 +287,7 @@ Conditions:
   UseS3BucketNameOrgPrefix: !Not [!Equals [!Ref S3BucketNameOrgPrefix, ""]]
   HasPermissionsBoundaryArn: !Not [!Equals [!Ref PermissionsBoundaryArn, ""]]
   CreateAlarms: !Equals [!Ref DeployEnvironment, "PROD"] 
+  IsArmArch: !Equals [!Ref FunctionArchitecture, "arm64"]
 
 # =============================================================================
 # GLOBALS
@@ -250,7 +327,7 @@ Resources:
       PropagateTags: True
 
       VersionDescription: "Development Stages"
-      AutoPublishCodeSha256: "202402260936" # Hash This To Overcome AliasLive Update Errors
+      AutoPublishCodeSha256: "20250226T0936" # Hash This To Overcome AliasLive Update Errors - Undocumented AWS bug workaround
       AutoPublishAlias: live
       DeploymentPreference:
         Enabled: !If [ IsProduction, True,  False] # Gradual deployment only if in production so DEV and TEST aren't hindered
@@ -264,9 +341,18 @@ Resources:
 
       CodeUri: src/
       Handler: index.handler
-      Runtime: nodejs20.x
+      Runtime: nodejs22.x # https://docs.aws.amazon.com/lambda/latest/dg/lambda-runtimes.html
+      Architectures:
+        - !Ref FunctionArchitecture # arm64 has better processing than default x86_64 - but layers and binaries must support
       Timeout: !Ref FunctionTimeOutInSeconds
       MemorySize: !Ref FunctionMaxMemoryInMB
+
+      # Lambda Insights and X-Ray Tracing
+      Tracing: !If [ IsNotDevelopment, "Active", !Ref 'AWS::NoValue'] # X-Ray
+      Layers:
+        # Lambda Insights and Param Secrets - Account and Version are Mapped in as they vary by region and architecture - Update regions and versions in Mapping section
+        - !Sub "arn:aws:lambda:${AWS::Region}:${!FindInMap [LambdaInsightsAccountId, !Ref 'AWS::Region', AccountId]}:layer:LambdaInsightsExtension${!If [IsArmArch, '-Arm64', '']}:${!If [IsArmArch, ${!FindInMap [LambdaInsightsArmVersion, !Ref 'AWS::Region', Ver]}, ${!FindInMap [LambdaInsightsVersion, !Ref 'AWS::Region', Ver]}]}"
+        - !Sub "arn:aws:lambda:${AWS::Region}:${!FindInMap [LambdaParamSecretsAccountId, !Ref 'AWS::Region', AccountId]}:layer:AWS-Parameters-and-Secrets-Lambda-Extension${!If [IsArmArch, '-Arm64', '']}:${!If [IsArmArch, ${!FindInMap [LambdaParamSecretsArmVersion, !Ref 'AWS::Region', Ver]}, ${!FindInMap [LambdaParamSecretsVersion, !Ref 'AWS::Region', Ver]}]}"
 
       Environment:
         Variables:

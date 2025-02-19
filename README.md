@@ -1,4 +1,7 @@
-# API Gateway with Lambda Function Written in Node.js
+# Basic API Gateway with Lambda Function Written in Node.js
+
+> Atlantis Configuration Repository for Serverless Deployments using AWS SAM
+
 
 A very simple example to demonstrate using the Atlantis AWS CodePipeline to provision a web service that utilizes API Gateway and a simple Lambda function written in Node.js.
 
