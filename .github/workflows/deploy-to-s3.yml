@@ -1,0 +1,31 @@
+name: Deploy Release to S3
+
+on:
+  release:
+    types: [published]
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    
+    permissions:
+      id-token: write
+      contents: read
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Configure AWS credentials
+        uses: aws-actions/configure-aws-credentials@v4
+        with:
+          role-to-assume: arn:aws:iam::${{ secrets.AWS_RELEASE_ACCT }}:role/github-actions-role
+          aws-region: ${{ secrets.AWS_RELEASE_REGION }}
+
+      - name: Copy release to S3
+        run: |
+          # Create a zip of the release
+          zip -r release.zip ./*
+          
+          # Copy to S3 with the release tag as part of the key
+          aws s3 cp release.zip s3://${{ secrets.AWS_RELEASE_BUCKET }}/${{ secrets.AWS_RELEASE_BUCKET_APP_STARTER_PATH }}/${{ github.event.release.tag_name }}/release.zip
