@@ -24,8 +24,11 @@ jobs:
 
       - name: Copy release to S3
         run: |
-          # Create a zip of the release
-          zip -r release.zip ./*
+          # Create the name of the zip file by taking github.repository from the context, removing the owner, and the "atlantis-serverless-app-starter-" from front
+          export ZIP_FILE_NAME=${GITHUB_REPOSITORY#*atlantis-serverless-app-starter-}
           
-          # Copy to S3 with the release tag as part of the key
-          aws s3 cp release.zip s3://${{ secrets.AWS_RELEASE_BUCKET }}/${{ secrets.AWS_RELEASE_BUCKET_APP_STARTER_PATH }}/${{ github.event.release.tag_name }}/release.zip
+          # Create a zip of the release
+          zip -r ${ZIP_FILE_NAME}.zip ./*
+          
+          # Copy to S3
+          aws s3 cp release.zip s3://${{ secrets.AWS_RELEASE_BUCKET }}/${{ secrets.AWS_RELEASE_BUCKET_APP_STARTER_PATH }}/${ZIP_FILE_NAME}.zip
