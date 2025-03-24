@@ -27,8 +27,8 @@ jobs:
           # Create the name of the zip file by taking github.repository from the context, removing the owner, and the "atlantis-starter-" from front
           export ZIP_FILE_NAME=${GITHUB_REPOSITORY#*atlantis-starter-}
           
-          # Create a zip of the release
-          zip -r ${ZIP_FILE_NAME}.zip ./*
+          # Create a zip of the release - we'll rename it during upload
+          zip -r release.zip ./*
           
           # Copy to S3
           aws s3 cp release.zip s3://${{ secrets.AWS_RELEASE_BUCKET }}/${{ secrets.AWS_RELEASE_BUCKET_APP_STARTER_PATH }}/${ZIP_FILE_NAME}.zip
