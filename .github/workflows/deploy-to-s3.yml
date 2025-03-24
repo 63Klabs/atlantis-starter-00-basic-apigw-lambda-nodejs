@@ -24,8 +24,8 @@ jobs:
 
       - name: Copy release to S3
         run: |
-          # Create the name of the zip file by taking github.repository from the context, removing the owner, and the "atlantis-serverless-app-starter-" from front
-          export ZIP_FILE_NAME=${GITHUB_REPOSITORY#*atlantis-serverless-app-starter-}
+          # Create the name of the zip file by taking github.repository from the context, removing the owner, and the "atlantis-starter-" from front
+          export ZIP_FILE_NAME=${GITHUB_REPOSITORY#*atlantis-starter-}
           
           # Create a zip of the release
           zip -r ${ZIP_FILE_NAME}.zip ./*
