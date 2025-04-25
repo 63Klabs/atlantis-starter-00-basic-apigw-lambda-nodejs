@@ -364,8 +364,16 @@ Resources:
       Tracing: !If [ IsNotDevelopment, "Active", !Ref 'AWS::NoValue'] # X-Ray
       Layers:
         # Lambda Insights and Param Secrets - Account and Version are Mapped in as they vary by region and architecture - Update regions and versions in Mapping section
-        - !Sub "arn:aws:lambda:${AWS::Region}:${!FindInMap [LambdaInsightsAccountId, !Ref 'AWS::Region', AccountId]}:layer:LambdaInsightsExtension${!If [IsArmArch, '-Arm64', '']}:${!If [IsArmArch, ${!FindInMap [LambdaInsightsArmVersion, !Ref 'AWS::Region', Ver]}, ${!FindInMap [LambdaInsightsVersion, !Ref 'AWS::Region', Ver]}]}"
-        - !Sub "arn:aws:lambda:${AWS::Region}:${!FindInMap [LambdaParamSecretsAccountId, !Ref 'AWS::Region', AccountId]}:layer:AWS-Parameters-and-Secrets-Lambda-Extension${!If [IsArmArch, '-Arm64', '']}:${!If [IsArmArch, ${!FindInMap [LambdaParamSecretsArmVersion, !Ref 'AWS::Region', Ver]}, ${!FindInMap [LambdaParamSecretsVersion, !Ref 'AWS::Region', Ver]}]}"
+        - !Sub 
+          - "arn:aws:lambda:${AWS::Region}:${InsightsAccount}:layer:LambdaInsightsExtension${ArmSuffix}:${Version}"
+          - InsightsAccount: !FindInMap [LambdaInsightsAccountId, !Ref 'AWS::Region', AccountId]
+            ArmSuffix: !If [IsArmArch, '-Arm64', '']
+            Version: !If [IsArmArch, !FindInMap [LambdaInsightsArmVersion, !Ref 'AWS::Region', Ver], !FindInMap [LambdaInsightsVersion, !Ref 'AWS::Region', Ver]]
+        - !Sub 
+          - "arn:aws:lambda:${AWS::Region}:${ParamAccount}:layer:AWS-Parameters-and-Secrets-Lambda-Extension${ArmSuffix}:${Version}"
+          - ParamAccount: !FindInMap [LambdaParamSecretsAccountId, !Ref 'AWS::Region', AccountId]
+            ArmSuffix: !If [IsArmArch, '-Arm64', '']
+            Version: !If [IsArmArch, !FindInMap [LambdaParamSecretsArmVersion, !Ref 'AWS::Region', Ver], !FindInMap [LambdaParamSecretsVersion, !Ref 'AWS::Region', Ver]]
 
       Environment:
         Variables:
