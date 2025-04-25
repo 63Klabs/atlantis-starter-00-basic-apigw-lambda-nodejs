@@ -231,23 +231,23 @@ Mappings:
 
   LambdaInsightsVersion:
     us-east-1:
-      Ver: "55"
+      Ver: "56"
     us-east-2:
-      Ver: "55"
+      Ver: "56"
     us-west-1:
-      Ver: "55"
+      Ver: "56"
     us-west-2:
-      Ver: "55"
+      Ver: "56"
 
   LambdaInsightsArmVersion:
     us-east-1:
-      Ver: "22"
+      Ver: "23"
     us-east-2:
-      Ver: "24"
+      Ver: "25"
     us-west-1:
-      Ver: "20"
+      Ver: "21"
     us-west-2:
-      Ver: "22"
+      Ver: "23"
 
   LambdaParamSecretsAccountId:
     us-east-1:
@@ -264,23 +264,23 @@ Mappings:
 
   LambdaParamSecretsVersion:
     us-east-1:
-      Ver: "14"
+      Ver: "17"
     us-east-2:
-      Ver: "12"
+      Ver: "21"
     us-west-1:
-      Ver: "12"
+      Ver: "17"
     us-west-2:
-      Ver: "12"
+      Ver: "17"
 
   LambdaParamSecretsArmVersion:
     us-east-1:
-      Ver: "14"
+      Ver: "17"
     us-east-2:
-      Ver: "12"
+      Ver: "21"
     us-west-1:
-      Ver: "9"
+      Ver: "14"
     us-west-2:
-      Ver: "12"
+      Ver: "17"
 
 # =============================================================================
 # CONDITIONS
