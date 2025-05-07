@@ -8,7 +8,7 @@
 # 
 # NOTE: As of v2 this template no longer supports CodeStar and Parameters have been refactored.
 #
-# USAGE/MORE INFO: https://github.com/chadkluck/serverless-webservice-template-for-pipeline-atlantis/blob/main/README.md
+# USAGE/MORE INFO: https://github.com/63klabs/serverless-webservice-template-for-pipeline-atlantis/blob/main/README.md
 
 AWSTemplateFormatVersion: "2010-09-09"
 Transform:  AWS::Serverless-2016-10-31
@@ -320,7 +320,7 @@ Globals:
 Resources:
 
   # ---------------------------------------------------------------------------
-  # API Gateway, Lambda, and Monitoring
+  # API Gateway
 
   # -- API Gateway --
   WebApi:
@@ -329,7 +329,39 @@ Resources:
       Name: !Sub '${Prefix}-${ProjectId}-${StageId}-WebApi'
       StageName: !Ref ApiPathBase
 
-  # -- Lambda Function --
+  #     # The following logging for API can only be enabled if an API GW service role is created
+  #     # https://docs.aws.amazon.com/apigateway/latest/developerguide/set-up-logging.html#set-up-access-logging-permissions
+  #     # Add API Gateway logging configuration
+  #     AccessLogSetting:
+  #       DestinationArn: !GetAtt ApiGatewayAccessLogGroup.Arn
+  #       Format: '{"requestId":"$context.requestId", "extendedRequestId":"$context.extendedRequestId", "ip":"$context.identity.sourceIp", "caller":"$context.identity.caller", "user":"$context.identity.user", "requestTime":"$context.requestTime", "httpMethod":"$context.httpMethod", "path":"$context.path", "resourcePath":"$context.resourcePath", "routeKey":"$context.routeKey", "status":"$context.status", "protocol":"$context.protocol", "responseLength":"$context.responseLength", "integrationError":"$context.integrationErrorMessage", "authorizerError":"$context.authorizer.error", "authorizerStatus":"$context.authorizer.status", "authorizerLatency":"$context.authorizer.latency"}'
+      
+  #     # Add execution logging to CloudWatch
+  #     MethodSettings:
+  #       - LoggingLevel: !If [IsProduction, ERROR, INFO]
+  #         ResourcePath: '/*'
+  #         HttpMethod: '*'
+  #         DataTraceEnabled: True #!If [IsProduction, False, True]
+  #         MetricsEnabled: True
+  
+  # # Add CloudWatch Log Group for API Gateway Access Logs
+  # ApiGatewayAccessLogGroup:
+  #   Type: AWS::Logs::LogGroup
+  #   Properties:
+  #     LogGroupName: !Sub '/aws/apigateway/${Prefix}-${ProjectId}-${StageId}-WebApi-access-logs'
+  #     RetentionInDays: !If [IsProduction, 30, 7]
+
+  # # Add CloudWatch Log Group for API Gateway Execution Logs
+  # ApiGatewayExecutionLogGroup:
+  #   Type: AWS::Logs::LogGroup
+  #   Properties:
+  #     LogGroupName: !Sub '/aws/apigateway/${Prefix}-${ProjectId}-${StageId}-WebApi-execution-logs'  # <-- consistent naming | default --> 'API-Gateway-Execution-Logs_${WebApi}/${ApiPathBase}'
+  #     RetentionInDays: !If [IsProduction, 30, 7]
+
+
+  # ---------------------------------------------------------------------------
+  # Lambda Function
+
   AppFunction:
     Type: AWS::Serverless::Function
     Properties:
@@ -431,7 +463,6 @@ Resources:
       SourceArn: !Sub "arn:aws:execute-api:${AWS::Region}:${AWS::AccountId}:${WebApi}/*"
 
   # -- Lambda Function Error Alarm --
-
   AppFunctionErrorsAlarm:
     Type: "AWS::CloudWatch::Alarm"
     Condition: CreateAlarms # Either PROD or ALWAYS - Check Conditions
@@ -452,10 +483,40 @@ Resources:
         - Ref: AppFunctionErrorAlarmNotification
 
   # -- Lambda Function Notification for Error Alarm --
-
   AppFunctionErrorAlarmNotification:
       Type: AWS::SNS::Topic
-      Condition: CreateAlarms
+      Condition: CreateAlarms # Either PROD or ALWAYS - Check Conditions
+      Properties: 
+        DisplayName: !Sub 'AWS-Alarm-${Prefix}-${ProjectId}-${StageId}'
+        FifoTopic: false
+        Subscription:
+          - Endpoint: !Ref AlarmNotificationEmail
+            Protocol: 'email'
+
+  # -- ApiGateway Error Alarm --
+  ApiGatewayErrorsAlarm:
+    Type: "AWS::CloudWatch::Alarm"
+    Condition: CreateAlarms # Either PROD or ALWAYS - Check Conditions
+    Properties:
+      AlarmDescription: API Gateway Error > 1
+      MetricName: Errors
+      Statistic: Sum
+      ComparisonOperator: GreaterThanThreshold
+      Threshold: 1
+      Period: 900
+      EvaluationPeriods: 1
+      TreatMissingData: notBreaching
+      Namespace: AWS/ApiGateway
+      Dimensions:
+        - Name: ApiName
+          Value: !Ref WebApi
+      AlarmActions:
+        - Ref: AppFunctionErrorAlarmNotification
+
+  # -- ApiGateway Notification for Error Alarm --
+  ApiGatewayErrorAlarmNotification:
+      Type: AWS::SNS::Topic
+      Condition: CreateAlarms # Either PROD or ALWAYS - Check Conditions
       Properties: 
         DisplayName: !Sub 'AWS-Alarm-${Prefix}-${ProjectId}-${StageId}'
         FifoTopic: false
@@ -464,10 +525,7 @@ Resources:
             Protocol: 'email'
 
 
-  # ---------------------------------------------------------------------------
-  # Resources for Lambda Function
-
-  # -- Log Group with a retention policy --
+  # -- Lambda Log Group with a retention policy --
   AppLogGroup:
     Type: AWS::Logs::LogGroup
     Properties: 

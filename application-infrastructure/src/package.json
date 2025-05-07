@@ -1,9 +1,9 @@
 {
-  "name": "8ball",
-  "version": "1.0.0",
-  "description": "Simple 8Ball Web Service",
+  "name": "basic_api_gateway_lambda_nodejs",
+  "version": "0.0.1",
+  "description": "Basic API Gateway with Lambda - Node.js",
   "main": "index.js",
-  "repository": "https://github.com/chadkluck/serverless-deploy-pipeline-atlantis",
+  "repository": "https://github.com/63klabs/atlantis-starter-00-basic-apigw-lambda-nodejs",
   "author": "Chad Kluck",
   "license": "MIT"
 }
