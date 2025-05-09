@@ -61,8 +61,8 @@ phases:
       
       # Install dependencies needed for application
       - ls -l -a
-      - cd application-infrastructure/app
-      - npm ci
+      - cd application-infrastructure/src
+      - npm install
 
       # FAIL the build if npm audit has vulnerabilities it can't fix
       # Perform a fix to move us forward, then check to make sure there were no unresolved high fixes
