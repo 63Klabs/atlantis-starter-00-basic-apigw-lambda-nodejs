@@ -2,17 +2,22 @@
 # either express or implied. See the License for the specific language governing permissions 
 # and limitations under the License.
 #
-# Web Service CloudFormation Application Infrastructure Template - SAMPLE
-# Chad Kluck
-# v2.2024-06-02 SAMPLE
-# 
-# NOTE: As of v2 this template no longer supports CodeStar and Parameters have been refactored.
-#
-# USAGE/MORE INFO: https://github.com/63klabs/serverless-webservice-template-for-pipeline-atlantis/blob/main/README.md
+# Atlantis for AWS SAM Deployments
+# Starter 00 - Basic API Gateway and Lambda using NodeJS
+# Author: Chad Kluck - 63klabs.net
+# Version: v2.0.1/2025-05-09
+
+# Documentation, Issues/Feature Requests, Latest Updates, and Security Reports on GitHub:
+# https://github.com/63Klabs/atlantis-starter-00-basic-apigw-lambda-nodejs
+
+# Creates a basic web service using API Gateway and Lambda using NodeJS
+
+# USE WITH:
+# - Atlantis pipeline/template.yml
 
 AWSTemplateFormatVersion: "2010-09-09"
 Transform:  AWS::Serverless-2016-10-31
-Description: "CloudFormation Application Infrastructure Template - SAMPLE"
+Description: "Creates a basic web service using API Gateway and Lambda using NodeJS - atlantis-starter-00-basic-apigw-lambda-nodejs"
 
 # =============================================================================
 # META DATA
@@ -52,7 +57,6 @@ Metadata:
         Parameters:
           - FunctionTimeOutInSeconds
           - FunctionMaxMemoryInMB
-          - FunctionArchitecture
       -
         Label:
           default: "Application Parameters"
@@ -80,7 +84,6 @@ Parameters:
     MinLength: 2
     MaxLength: 8
     ConstraintDescription: "2 to 8 characters. Lower case alphanumeric and dashes. Must start with a letter and end with a letter or number. Length of Prefix + Project ID should not exceed 28 characters."
-  
   ProjectId:
     Type: String
     Description: "This is the Project or Application Identifier. If you receive 'S3 bucket name too long' errors during stack creation, then you must shorten the Project ID or use an S3 Org Prefix. Due to resource naming length restrictions, length of Prefix + Project ID should not exceed 28 characters. Resources are named <Prefix>-<ProjectId>-<StageId>-<ResourceId>"
@@ -88,7 +91,6 @@ Parameters:
     MinLength: 2
     MaxLength: 26
     ConstraintDescription: "Minimum of 2 characters (suggested maximum of 20). Lower case alphanumeric and dashes. Must start with a letter and end with a letter or number. Length of Prefix + Project ID should not exceed 28 characters."
-  
   StageId:
     Type: String
     Description: "This is an alias for the branch. It does not need to match CodeCommitBranch or DeployEnvironment. Due to resource naming restrictions you can use this to provide shorter names without special characters that are allowed in branch names. For example if you have a 'test/feature-98' branch, you could use 'tf98' as the StageId. Resources are named <Prefix>-<ProjectId>-<StageId>-<ResourceId>"
@@ -96,14 +98,12 @@ Parameters:
     MinLength: 2
     MaxLength: 8
     ConstraintDescription: "2 to 8 characters. Lower case alphanumeric and dashes. Must start with a letter and end with a letter or number."
-  
   S3BucketNameOrgPrefix:
     Type: String
     Description: "By default, to enforce uniqueness, buckets include account and region in the bucket name. However, due to character limits, you can specify your own S3 prefix (like an org code). This will be used in addition to the Prefix entered above. Note that this length is shared with the recommended length of 20 characters for Resource Identifiers. So if you have a 10 character S3BucketNameOrgPrefix, you are limited to 10 characters for your bucket name identifier in your templates. Buckets are named <Prefix>-<Region>-<AccountId>-<ProjectId>-<StageId>-<ResourceId> or <S3OrgPrefix>-<Prefix>-<ProjectId>-<StageId>-<ResourceId>"
     Default: ""
     AllowedPattern: "^[a-z0-9][a-z0-9-]{0,18}[a-z0-9]$|^$"
     ConstraintDescription: "May be empty or 2 to 20 characters (8 or less recommended). Lower case alphanumeric and dashes. Must start and end with a letter or number."
-  
   RolePath:
     Type: String
     Description: "Path to use for IAM Roles and Policies. You may wish to separate out your applications from users, or create seperate paths per prefix or application. Specific paths may required by permission boundaries. Ex: /ws-hello-world-test/ or /app_role/"
@@ -135,7 +135,6 @@ Parameters:
       - "Linear10PercentEvery3Minutes"
       - "Linear10PercentEvery10Minutes"
       - "AllAtOnce" # All at once. Recommended only for TEST and DEV environments.
-  
   DeployRole:
     Type: String
     Description: "IAM role to allow AWS CodeDeploy to manage deployment of AWS Lambda functions"
@@ -149,13 +148,11 @@ Parameters:
     Default: "/"
     AllowedPattern: "^\\/([a-zA-Z0-9_.\\-]*[\\/])+$|^\\/$"
     ConstraintDescription: "Must only contain alpha-numeric, dashes, underscores, or slashes. Must be a single slash or begin and end with a slash. (/Finance/, /Finance/ops/, or /)"
-  
   AlarmNotificationEmail:
     Type: String
     Description: "Email address to send notifications to when alarms are triggered. Be sure to check the inbox as you will need to confirm the subscription."
     AllowedPattern: "^[\\w\\-\\.]+@([\\w\\-]+\\.)+[\\w\\-]{2,4}$"
     ConstraintDescription: "A valid email address"
-  
   PermissionsBoundaryArn:
     Type: String
     Description: "Permissions Boundary is a policy attached to a role to further restrict the permissions of the role. Your organization may or may not require boundaries. If left empty, no permissions boundary will be used."
@@ -172,14 +169,12 @@ Parameters:
     Default: 10
     MinValue: 3
     MaxValue: 30
-  
   FunctionMaxMemoryInMB:
     Type: Number
     Description: "If you are handling large responses, you will need to increase the size. Monitor CloudWatch logs"
     Default: 128
     AllowedValues: [128, 192, 256, 320, 384, 448, 512]
     ConstraintDescription: "Min 128, Max 512 in increments of 64"
-
   FunctionArchitecture:
     Type: String
     Description: "The instruction set architecture for the Lambda function. Lambda functions support x86_64 and arm64 architectures. arm64 has better processing than default x86_64 - but the layers and binaries you use must support it."
@@ -197,13 +192,11 @@ Parameters:
     MaxLength: 128
     MinLength: 1
     ConstraintDescription: "1-128 lowercase alpha numeric, hyphens, and underscores. Must begin and end with an alphanumeric character."
-
   LogRetentionInDaysForPROD:
     Type: Number
     Description: "How long should CloudWatch logs be kept in a PRODUCTION environment?"
     Default: 90
     AllowedValues: [1, 3, 5, 7, 14, 30, 60, 90, 120, 150, 180, 365, 400, 545, 731, 1827, 3653]
-
   LogRetentionInDaysForDEVTEST:
     Type: Number
     Description: "How long should CloudWatch logs be kept in a DEV or TEST environment?"
@@ -231,56 +224,56 @@ Mappings:
 
   LambdaInsightsVersion:
     us-east-1:
-      Ver: "56"
+      Ver: "55"
     us-east-2:
-      Ver: "56"
+      Ver: "55"
     us-west-1:
-      Ver: "56"
+      Ver: "55"
     us-west-2:
-      Ver: "56"
+      Ver: "55"
 
   LambdaInsightsArmVersion:
     us-east-1:
-      Ver: "23"
+      Ver: "22"
     us-east-2:
-      Ver: "25"
+      Ver: "24"
     us-west-1:
-      Ver: "21"
+      Ver: "20"
     us-west-2:
-      Ver: "23"
+      Ver: "22"
 
-  LambdaParamSecretsAccountId:
-    us-east-1:
-      AccountId: "177933569100"
-    us-east-2:
-      AccountId: "590474943231"
-    us-west-1:
-      AccountId: "997803712105"
-    us-west-2:
-      AccountId: "345057560386"
-    # Add more regions as needed
-    # https://docs.aws.amazon.com/systems-manager/latest/userguide/ps-integration-lambda-extensions.html#ps-integration-lambda-extensions-add
-    # These accounts and layers are AWS Managed so you can trust them - They are not some random accounts
+  # LambdaParamSecretsAccountId:
+  #   us-east-1:
+  #     AccountId: "177933569100"
+  #   us-east-2:
+  #     AccountId: "590474943231"
+  #   us-west-1:
+  #     AccountId: "997803712105"
+  #   us-west-2:
+  #     AccountId: "345057560386"
+  #   # Add more regions as needed
+  #   # https://docs.aws.amazon.com/systems-manager/latest/userguide/ps-integration-lambda-extensions.html#ps-integration-lambda-extensions-add
+  #   # These accounts and layers are AWS Managed so you can trust them - They are not some random accounts
 
-  LambdaParamSecretsVersion:
-    us-east-1:
-      Ver: "17"
-    us-east-2:
-      Ver: "21"
-    us-west-1:
-      Ver: "17"
-    us-west-2:
-      Ver: "17"
+  # LambdaParamSecretsVersion:
+  #   us-east-1:
+  #     Ver: "14"
+  #   us-east-2:
+  #     Ver: "12"
+  #   us-west-1:
+  #     Ver: "12"
+  #   us-west-2:
+  #     Ver: "12"
 
-  LambdaParamSecretsArmVersion:
-    us-east-1:
-      Ver: "17"
-    us-east-2:
-      Ver: "21"
-    us-west-1:
-      Ver: "14"
-    us-west-2:
-      Ver: "17"
+  # LambdaParamSecretsArmVersion:
+  #   us-east-1:
+  #     Ver: "14"
+  #   us-east-2:
+  #     Ver: "12"
+  #   us-west-1:
+  #     Ver: "9"
+  #   us-west-2:
+  #     Ver: "12"
 
 # =============================================================================
 # CONDITIONS
@@ -290,13 +283,14 @@ Mappings:
 
 Conditions:
   IsProduction: !Equals [!Ref DeployEnvironment, "PROD"]
-  IsNotProduction: !Not [!Equals [!Ref DeployEnvironment, "PROD"]]
-  IsTest: !Equals [!Ref DeployEnvironment, "TEST"]
-  IsDevelopment: !Equals [!Ref DeployEnvironment, "DEV"]
-  CreateProdResources: !Equals [!Ref DeployEnvironment, "PROD"]
-  CreateTestResources: !Equals [!Ref DeployEnvironment, "TEST"]
-  CreateDevResources: !Equals [!Ref DeployEnvironment, "DEV"]
-  UseS3BucketNameOrgPrefix: !Not [!Equals [!Ref S3BucketNameOrgPrefix, ""]]
+  # IsNotProduction: !Not [!Equals [!Ref DeployEnvironment, "PROD"]]
+  IsNotDevelopment: !Not [!Equals [!Ref DeployEnvironment, "DEV"]]
+  # IsTest: !Equals [!Ref DeployEnvironment, "TEST"]
+  # IsDevelopment: !Equals [!Ref DeployEnvironment, "DEV"]
+  # CreateProdResources: !Equals [!Ref DeployEnvironment, "PROD"]
+  # CreateTestResources: !Equals [!Ref DeployEnvironment, "TEST"]
+  # CreateDevResources: !Equals [!Ref DeployEnvironment, "DEV"]
+  # UseS3BucketNameOrgPrefix: !Not [!Equals [!Ref S3BucketNameOrgPrefix, ""]]
   HasPermissionsBoundaryArn: !Not [!Equals [!Ref PermissionsBoundaryArn, ""]]
   CreateAlarms: !Equals [!Ref DeployEnvironment, "PROD"] 
   IsArmArch: !Equals [!Ref FunctionArchitecture, "arm64"]
@@ -320,7 +314,7 @@ Globals:
 Resources:
 
   # ---------------------------------------------------------------------------
-  # API Gateway
+  # API Gateway Resources
 
   # -- API Gateway --
   WebApi:
@@ -329,8 +323,10 @@ Resources:
       Name: !Sub '${Prefix}-${ProjectId}-${StageId}-WebApi'
       StageName: !Ref ApiPathBase
 
-  #     # The following logging for API can only be enabled if an API GW service role is created
-  #     # https://docs.aws.amazon.com/apigateway/latest/developerguide/set-up-logging.html#set-up-access-logging-permissions
+  #     # -- The following is how to add logging to the API Gateway --
+  #     # -- However, you will need to add a service role to allow API Gateway to write to CloudWatch logs --
+  #     # -- See https://docs.aws.amazon.com/apigateway/latest/developerguide/set-up-logging.html --
+  
   #     # Add API Gateway logging configuration
   #     AccessLogSetting:
   #       DestinationArn: !GetAtt ApiGatewayAccessLogGroup.Arn
@@ -347,6 +343,8 @@ Resources:
   # # Add CloudWatch Log Group for API Gateway Access Logs
   # ApiGatewayAccessLogGroup:
   #   Type: AWS::Logs::LogGroup
+  #   DeletionPolicy: Delete
+  #   UpdateReplacePolicy: Retain
   #   Properties:
   #     LogGroupName: !Sub '/aws/apigateway/${Prefix}-${ProjectId}-${StageId}-WebApi-access-logs'
   #     RetentionInDays: !If [IsProduction, 30, 7]
@@ -354,14 +352,16 @@ Resources:
   # # Add CloudWatch Log Group for API Gateway Execution Logs
   # ApiGatewayExecutionLogGroup:
   #   Type: AWS::Logs::LogGroup
+  #   DeletionPolicy: Delete
+  #   UpdateReplacePolicy: Retain
   #   Properties:
-  #     LogGroupName: !Sub '/aws/apigateway/${Prefix}-${ProjectId}-${StageId}-WebApi-execution-logs'  # <-- consistent naming | default --> 'API-Gateway-Execution-Logs_${WebApi}/${ApiPathBase}'
+  #     LogGroupName: !Sub '/aws/apigateway/${Prefix}-${ProjectId}-${StageId}-WebApi-execution-logs'  # <-- consistent naming | aws default --> 'API-Gateway-Execution-Logs_${WebApi}/${ApiPathBase}'
   #     RetentionInDays: !If [IsProduction, 30, 7]
 
-
   # ---------------------------------------------------------------------------
-  # Lambda Function
+  # Lambda Function Resources
 
+  # -- Lambda Function --
   AppFunction:
     Type: AWS::Serverless::Function
     Properties:
@@ -373,7 +373,6 @@ Resources:
       VersionDescription: "Development Stages"
       AutoPublishCodeSha256: "20250226T0936" # Hash This To Overcome AliasLive Update Errors - Undocumented AWS bug workaround
       AutoPublishAlias: live
-
       DeploymentPreference:
         Enabled: !If [ IsProduction, True,  False] # Gradual deployment only if in production so DEV and TEST aren't hindered
         Type: !If [ IsProduction, !Ref FunctionGradualDeploymentType, "AllAtOnce"]
@@ -394,22 +393,24 @@ Resources:
 
       # Lambda Insights and X-Ray Tracing
       Tracing: !If [ IsNotDevelopment, "Active", !Ref 'AWS::NoValue'] # X-Ray
+
       Layers:
-        # Lambda Insights and Param Secrets - Account and Version are Mapped in as they vary by region and architecture - Update regions and versions in Mapping section
+        # Lambda Insights Layer - Account and Version are Mapped in as they vary by region and architecture - Update regions and versions in Mapping section
         - !Sub 
           - "arn:aws:lambda:${AWS::Region}:${InsightsAccount}:layer:LambdaInsightsExtension${ArmSuffix}:${Version}"
           - InsightsAccount: !FindInMap [LambdaInsightsAccountId, !Ref 'AWS::Region', AccountId]
             ArmSuffix: !If [IsArmArch, '-Arm64', '']
             Version: !If [IsArmArch, !FindInMap [LambdaInsightsArmVersion, !Ref 'AWS::Region', Ver], !FindInMap [LambdaInsightsVersion, !Ref 'AWS::Region', Ver]]
-        - !Sub 
-          - "arn:aws:lambda:${AWS::Region}:${ParamAccount}:layer:AWS-Parameters-and-Secrets-Lambda-Extension${ArmSuffix}:${Version}"
-          - ParamAccount: !FindInMap [LambdaParamSecretsAccountId, !Ref 'AWS::Region', AccountId]
-            ArmSuffix: !If [IsArmArch, '-Arm64', '']
-            Version: !If [IsArmArch, !FindInMap [LambdaParamSecretsArmVersion, !Ref 'AWS::Region', Ver], !FindInMap [LambdaParamSecretsVersion, !Ref 'AWS::Region', Ver]]
+        # Lambda Parameters and Secrets Layer - Account and Version are Mapped in as they vary by region and architecture - Update regions and versions in Mapping section
+        # - !Sub 
+        #   - "arn:aws:lambda:${AWS::Region}:${ParamAccount}:layer:AWS-Parameters-and-Secrets-Lambda-Extension${ArmSuffix}:${Version}"
+        #   - ParamAccount: !FindInMap [LambdaParamSecretsAccountId, !Ref 'AWS::Region', AccountId]
+        #     ArmSuffix: !If [IsArmArch, '-Arm64', '']
+        #     Version: !If [IsArmArch, !FindInMap [LambdaParamSecretsArmVersion, !Ref 'AWS::Region', Ver], !FindInMap [LambdaParamSecretsVersion, !Ref 'AWS::Region', Ver]]
 
       Environment:
         Variables:
-          detailedLogs: !If [ IsProduction, "0",  "5"] # 0 for prod, 2-5 for non-prod
+          detailedLogs: !If [ IsProduction, "0",  "2"]
           deployEnvironment: !Ref DeployEnvironment
           paramStore: !Ref ParameterStoreHierarchy
           lambdaTimeoutInSeconds: !Ref FunctionTimeOutInSeconds # so we can calculate any external connection timeout in our code
@@ -463,6 +464,7 @@ Resources:
       SourceArn: !Sub "arn:aws:execute-api:${AWS::Region}:${AWS::AccountId}:${WebApi}/*"
 
   # -- Lambda Function Error Alarm --
+
   AppFunctionErrorsAlarm:
     Type: "AWS::CloudWatch::Alarm"
     Condition: CreateAlarms # Either PROD or ALWAYS - Check Conditions
@@ -483,9 +485,10 @@ Resources:
         - Ref: AppFunctionErrorAlarmNotification
 
   # -- Lambda Function Notification for Error Alarm --
+
   AppFunctionErrorAlarmNotification:
       Type: AWS::SNS::Topic
-      Condition: CreateAlarms # Either PROD or ALWAYS - Check Conditions
+      Condition: CreateAlarms
       Properties: 
         DisplayName: !Sub 'AWS-Alarm-${Prefix}-${ProjectId}-${StageId}'
         FifoTopic: false
@@ -493,41 +496,11 @@ Resources:
           - Endpoint: !Ref AlarmNotificationEmail
             Protocol: 'email'
 
-  # -- ApiGateway Error Alarm --
-  ApiGatewayErrorsAlarm:
-    Type: "AWS::CloudWatch::Alarm"
-    Condition: CreateAlarms # Either PROD or ALWAYS - Check Conditions
-    Properties:
-      AlarmDescription: API Gateway Error > 1
-      MetricName: Errors
-      Statistic: Sum
-      ComparisonOperator: GreaterThanThreshold
-      Threshold: 1
-      Period: 900
-      EvaluationPeriods: 1
-      TreatMissingData: notBreaching
-      Namespace: AWS/ApiGateway
-      Dimensions:
-        - Name: ApiName
-          Value: !Ref WebApi
-      AlarmActions:
-        - Ref: AppFunctionErrorAlarmNotification
-
-  # -- ApiGateway Notification for Error Alarm --
-  ApiGatewayErrorAlarmNotification:
-      Type: AWS::SNS::Topic
-      Condition: CreateAlarms # Either PROD or ALWAYS - Check Conditions
-      Properties: 
-        DisplayName: !Sub 'AWS-Alarm-${Prefix}-${ProjectId}-${StageId}'
-        FifoTopic: false
-        Subscription:
-          - Endpoint: !Ref AlarmNotificationEmail
-            Protocol: 'email'
-
-
-  # -- Lambda Log Group with a retention policy --
+  # -- Log Group with a retention policy --
   AppLogGroup:
     Type: AWS::Logs::LogGroup
+    DeletionPolicy: Delete
+    UpdateReplacePolicy: Retain
     Properties: 
         LogGroupName: !Sub '/aws/lambda/${Prefix}-${ProjectId}-${StageId}-AppFunction' # Avoid circular reference !Sub "/aws/lambda/${AppFunction}"
         RetentionInDays: !If [ IsProduction, !Ref LogRetentionInDaysForPROD,  !Ref LogRetentionInDaysForDEVTEST]
