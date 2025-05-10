@@ -17,7 +17,7 @@
 
 AWSTemplateFormatVersion: "2010-09-09"
 Transform:  AWS::Serverless-2016-10-31
-Description: "Creates a basic web service using API Gateway and Lambda using NodeJS - atlantis-starter-00-basic-apigw-lambda-nodejs"
+Description: "A basic web service using API Gateway and Lambda NodeJS - atlantis-starter-00-basic-apigw-lambda-nodejs"
 
 # =============================================================================
 # META DATA
@@ -515,7 +515,7 @@ Resources:
 #
 
 Outputs:
-  UserAPI:
+  EndpointURL:
     Description: "Endpoint Test URL"
     Value: !Sub "https://${WebApi}.execute-api.${AWS::Region}.amazonaws.com/${ApiPathBase}/"
   CloudWatchLogGroup:
