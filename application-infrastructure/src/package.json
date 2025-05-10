@@ -5,5 +5,8 @@
   "main": "index.js",
   "repository": "https://github.com/63klabs/atlantis-starter-00-basic-apigw-lambda-nodejs",
   "author": "Chad Kluck",
-  "license": "MIT"
+  "license": "MIT",
+  "devDependencies": {
+    "aws-xray-sdk": "^3.x.x"
+  }
 }

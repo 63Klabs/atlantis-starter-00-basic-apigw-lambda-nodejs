@@ -1,3 +1,5 @@
+const AWSXRay = require('aws-xray-sdk');
+
 console.log ("COLD START");
 
 const answers = [ 
@@ -33,21 +35,27 @@ const answers = [
  * @returns 
  */
 exports.handler = async (event, context, callback) => {
-
+	// Create a new segment for the Lambda function
+	const segment = AWSXRay.getSegment();
+	const subsegment = segment.addNewSubsegment('handler');
+		
 	let response = null;
 
     try {
+        
         response = processRequest(event, context); // process the request and wait for the result
         
     } catch (error) {
 		// send error message and trace to CloudWatch logs
 		console.error(`Error in 7G: ${error.message}`, error.stack);
+		subsegment.addError(error);
         response = {
 			statusCode: 500,
 			body: JSON.stringify({ status: 500, message: 'Internal server error in 7G' }),
 			headers: {'content-type': 'application/json'}
 		};
     } finally {
+		subsegment.close();
 		callback(null, response); // send the result back to Gateway API
 	}	
 };
@@ -61,7 +69,7 @@ exports.handler = async (event, context, callback) => {
  */
 const processRequest = function(event, context) {
 
-	// do something
+
 	const rand = Math.floor(Math.random() * answers.length);
 
 	const prediction = answers[rand];
