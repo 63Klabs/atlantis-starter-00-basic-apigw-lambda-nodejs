@@ -34,17 +34,22 @@ const answers = [
  */
 exports.handler = async (event, context, callback) => {
 
+	let response = null;
+
     try {
-        const response = processRequest(event, context); // process the request and wait for the result
-        callback(null, response); // send the result back to Gateway API
+        response = processRequest(event, context); // process the request and wait for the result
+        
     } catch (error) {
-		console.error(error); // log the error to CloudWatch
-        callback(null, {
+		// send error message and trace to CloudWatch logs
+		console.error(`Error in 7G: ${error.message}`, error.stack);
+        response = {
 			statusCode: 500,
 			body: JSON.stringify({ status: 500, message: 'Internal server error in 7G' }),
 			headers: {'content-type': 'application/json'}
-		}); // send the error back to Gateway API
-    }
+		};
+    } finally {
+		callback(null, response); // send the result back to Gateway API
+	}	
 };
 
 /**
