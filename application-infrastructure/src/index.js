@@ -1,5 +1,3 @@
-const AWSXRay = require('aws-xray-sdk');
-
 console.log ("COLD START");
 
 const answers = [ 
@@ -34,53 +32,46 @@ const answers = [
  * @param {*} callback 
  * @returns 
  */
-exports.handler = async (event, context, callback) => {
-	// Create a new segment for the Lambda function
-	const segment = AWSXRay.getSegment();
-	const subsegment = segment.addNewSubsegment('handler');
-		
+exports.handler = async (event, context) => {
+
 	let response = null;
 
     try {
-        
-        response = processRequest(event, context); // process the request and wait for the result
-        
-    } catch (error) {
+
+        response = processRequest(event, context); // process the request and wait for the result        
+    
+	} catch (error) {
 		// send error message and trace to CloudWatch logs
 		console.error(`Error in 7G: ${error.message}`, error.stack);
-		subsegment.addError(error);
         response = {
 			statusCode: 500,
 			body: JSON.stringify({ status: 500, message: 'Internal server error in 7G' }),
 			headers: {'content-type': 'application/json'}
 		};
     } finally {
-		subsegment.close();
-		callback(null, response); // send the result back to Gateway API
+		return response; // Return the response directly instead of using callback
 	}	
 };
 
 /**
  * Process the request
  * 
- * @param {array} event The event passed to the lambda function
- * @param {array} context The context passed to the lambda function
- * @returns {array} Response to send up to AWS API Gateway
+ * @param {object} event The event passed to the lambda function
+ * @param {object} context The context passed to the lambda function
+ * @returns {object} Response to send up to AWS API Gateway
  */
 const processRequest = function(event, context) {
-
-
+	
 	const rand = Math.floor(Math.random() * answers.length);
-
 	const prediction = answers[rand];
-
+			
 	// Gets sent to CloudWatch logs. Check it out!
 	console.log(`Prediction log: ${prediction}`);
-
+	
 	return {
 		statusCode: 200,
 		body: JSON.stringify( { prediction } ),
 		headers: {'content-type': 'application/json'}
-	}; 
+	};
 
 };
