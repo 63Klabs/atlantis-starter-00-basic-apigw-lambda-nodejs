@@ -1,8 +1,7 @@
 # Basic API Gateway with Lambda Function Written in Node.js
 
-> Atlantis Configuration Repository for Serverless Deployments using AWS SAM
+> For use with template-pipeline.yml which can be deployed using [Atlantis Configuration Repository for Serverless Deployments using AWS SAM](hhttps://github.com/63Klabs/atlantis-cfn-configuration-repo-for-serverless-deployments)
 
+A very simple example to demonstrate Atlantis Template for AWS CodePipeline to provision a web service that utilizes API Gateway and a simple Lambda function written in Node.js.
 
-A very simple example to demonstrate using the Atlantis AWS CodePipeline to provision a web service that utilizes API Gateway and a simple Lambda function written in Node.js.
-
-> Note: To keep this example VERY basic and simple, concepts such as advanced logging, monitoring, and caching are not used. For near production-ready examples, review the the other application blueprints in this repository.
+> Note: To keep this example VERY basic and simple, concepts such as routing, caching, and advanced monitoring are not used. For near production-ready examples, review the the other Atlantis starter applications.
