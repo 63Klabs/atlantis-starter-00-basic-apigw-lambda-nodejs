@@ -4,7 +4,7 @@
   },
   "Tags": {
     "Name": "Hello World Web Service API $PREFIX$-$PROJECT_ID$",
-    "CostCenter": "X1234",
+    "CostCenter": "1234-X",
     "Creator": "nowhere@example",
     "Owner": "nowhere@example",
     "Department": "Web Services",
