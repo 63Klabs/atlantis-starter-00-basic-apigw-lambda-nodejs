@@ -29,8 +29,7 @@ const answers = [
  * 
  * @param {*} event 
  * @param {*} context 
- * @param {*} callback 
- * @returns 
+ * @returns {{statusCode: number, body: string, headers: object}}
  */
 exports.handler = async (event, context) => {
 
