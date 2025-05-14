@@ -49,6 +49,9 @@ phases:
   build:
     commands:
 
+      # There is sometimes a bug that causes the alias to not be updated correctly (see comment in template.yml for AppFunction.Properties.AutoPublishCodeSha256)
+      - python3 ./build-scripts/update_template_timestamp.py template.yml
+
       # Use CloudFormation to package the application infrastructure and code that was placed in the S3 Deploy Bucket
       - aws cloudformation package --template template.yml --s3-bucket $S3_DEPLOY_BUCKET --output-template template-export.yml
 
