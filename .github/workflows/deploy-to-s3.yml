@@ -23,6 +23,9 @@ jobs:
           aws-region: ${{ secrets.AWS_RELEASE_REGION }}
 
       - name: Copy release to S3
+        env:
+          AWS_RELEASE_BUCKET: ${{ vars.AWS_RELEASE_BUCKET }}
+          AWS_RELEASE_BUCKET_APP_STARTER_PATH: ${{ vars.AWS_RELEASE_BUCKET_APP_STARTER_PATH }}
         run: |
           # Create the name of the zip file by taking github.repository from the context removing the owner, and the "atlantis-starter-" from front
           export ZIP_FILE_NAME=${GITHUB_REPOSITORY#*atlantis-starter-}
@@ -31,4 +34,4 @@ jobs:
           zip -r release.zip ./*
           
           # Copy to S3
-          aws s3 cp release.zip s3://${{ vars.AWS_RELEASE_BUCKET }}${{ vars.AWS_RELEASE_BUCKET_APP_STARTER_PATH }}${ZIP_FILE_NAME}.zip
+          aws s3 cp release.zip "s3://${AWS_RELEASE_BUCKET}${AWS_RELEASE_BUCKET_APP_STARTER_PATH}${ZIP_FILE_NAME}.zip"
