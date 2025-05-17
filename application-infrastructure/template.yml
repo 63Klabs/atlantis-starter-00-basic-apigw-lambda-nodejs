@@ -263,7 +263,7 @@ Resources:
       StageName: !Ref ApiPathBase
 
   #     # -- The following is how to add logging to the API Gateway --
-  #     # -- However, you will need to add a service role to allow API Gateway to write to CloudWatch logs --
+  #     # -- However, an account admin will need to add a service role to allow API Gateway to write to CloudWatch logs --
   #     # -- See https://docs.aws.amazon.com/apigateway/latest/developerguide/set-up-logging.html --
   
   #     # Add API Gateway logging configuration
@@ -419,7 +419,7 @@ Resources:
           - Endpoint: !Ref AlarmNotificationEmail
             Protocol: 'email'
 
-  # -- Log Group with a retention policy --
+  # -- Lambda Log Group with a retention policy --
   AppLogGroup:
     Type: AWS::Logs::LogGroup
     DeletionPolicy: Delete
