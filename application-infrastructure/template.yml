@@ -364,7 +364,7 @@ Resources:
       # These are the resources your Lambda function needs access to Logs, SSM Parameters, DynamoDb, S3, etc.
       # Define specific actions such as get/put (read/write). Work towards practicing the Principle of Least Privilege
       Policies:
-      - PolicyName: LambdaResourceAccessPolicies
+      - PolicyName: !Sub "${Prefix}-${ProjectId}-${StageId}-ExecutionPolicy"
         PolicyDocument:
           Statement:
 
