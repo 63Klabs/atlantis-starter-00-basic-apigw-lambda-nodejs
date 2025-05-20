@@ -37,26 +37,23 @@ Metadata:
           - StageId
           - S3BucketNameOrgPrefix
           - RolePath
+          - PermissionsBoundaryArn
+          - ParameterStoreHierarchy
       -
         Label:
           default: "Deployment Environment Information"
         Parameters:
           - DeployEnvironment
-          - FunctionGradualDeploymentType
           - DeployRole
-      -
-        Label:
-          default: "External Resources and Alarm Notifications"
-        Parameters:
-          - ParameterStoreHierarchy
+          - FunctionGradualDeploymentType
           - AlarmNotificationEmail
-          - PermissionsBoundaryArn
       -
         Label:
           default: "Lambda Function Settings"
         Parameters:
           - FunctionTimeOutInSeconds
           - FunctionMaxMemoryInMB
+          - FunctionArchitecture
       -
         Label:
           default: "Application Parameters"
@@ -115,6 +112,20 @@ Parameters:
     AllowedPattern: "^\\/([a-zA-Z0-9-_]+[\\/])+$|^\\/$"
     ConstraintDescription: "May only contain alphanumeric characters, forward slashes, underscores, and dashes. Must begin and end with a slash."
 
+  ParameterStoreHierarchy:
+    Type: String
+    Description: "Parameters specific to the application may be organized within a hierarchy based on your organizational or operations structure. For example, /Finance/ops/ for this value would then generate /Finance/ops/<DeployEnvironment>/<Prefix>-<ProjectId>-<StageId>/<parameterName>. Must either be a single '/' or begin and end with a '/'."
+    Default: "/"
+    AllowedPattern: "^\\/([a-zA-Z0-9_.\\-]*[\\/])+$|^\\/$"
+    ConstraintDescription: "Must only contain alpha-numeric, dashes, underscores, or slashes. Must be a single slash or begin and end with a slash. (/Finance/, /Finance/ops/, or /)"
+
+  PermissionsBoundaryArn:
+    Type: String
+    Description: "Permissions Boundary is a policy attached to a role to further restrict the permissions of the role. Your organization may or may not require boundaries. If left empty, no permissions boundary will be used."
+    Default: ""
+    AllowedPattern: "^$|^arn:aws:iam::\\d{12}:policy\\/[\\w+=,.@\\-\\/]*[\\w+=,.@\\-]+$"
+    ConstraintDescription: "Must be empty or a valid IAM Policy ARN in the format: arn:aws:iam::{account_id}:policy/{policy_name}"
+
   # ---------------------------------------------------------------------------
   # Deployment Environment Identification
 
@@ -124,6 +135,12 @@ Parameters:
     Default: "PROD"
     AllowedValues: ["DEV", "TEST", "PROD"]
     ConstraintDescription: "Must specify DEV, TEST, or PROD."
+
+  DeployRole:
+    Type: String
+    Description: "IAM role to allow AWS CodeDeploy to manage deployment of AWS Lambda functions"
+    AllowedPattern: "^arn:aws:iam::\\d{12}:role/[\\w+=,.@\\-\\/]*[\\w+=,.@\\-\\/]{1}$"
+    ConstraintDescription: "A valid IAM role ARN"
 
   FunctionGradualDeploymentType:
     Type: String
@@ -140,32 +157,12 @@ Parameters:
       - "Linear10PercentEvery10Minutes"
       - "AllAtOnce" # All at once. Recommended only for TEST and DEV environments.
 
-  DeployRole:
-    Type: String
-    Description: "IAM role to allow AWS CodeDeploy to manage deployment of AWS Lambda functions"
-
-  # ---------------------------------------------------------------------------
-  # External Resources and Alarm Notifications
-
-  ParameterStoreHierarchy:
-    Type: String
-    Description: "Parameters specific to the application may be organized within a hierarchy based on your organizational or operations structure. For example, /Finance/ops/ for this value would then generate /Finance/ops/<DeployEnvironment>/<Prefix>-<ProjectId>-<StageId>/<parameterName>. Must either be a single '/' or begin and end with a '/'."
-    Default: "/"
-    AllowedPattern: "^\\/([a-zA-Z0-9_.\\-]*[\\/])+$|^\\/$"
-    ConstraintDescription: "Must only contain alpha-numeric, dashes, underscores, or slashes. Must be a single slash or begin and end with a slash. (/Finance/, /Finance/ops/, or /)"
 
   AlarmNotificationEmail:
     Type: String
     Description: "Email address to send notifications to when alarms are triggered. Be sure to check the inbox as you will need to confirm the subscription."
     AllowedPattern: "^[\\w\\-\\.]+@([\\w\\-]+\\.)+[\\w\\-]{2,4}$"
     ConstraintDescription: "A valid email address"
-
-  PermissionsBoundaryArn:
-    Type: String
-    Description: "Permissions Boundary is a policy attached to a role to further restrict the permissions of the role. Your organization may or may not require boundaries. If left empty, no permissions boundary will be used."
-    Default: ""
-    AllowedPattern: "^$|^arn:aws:iam::\\d{12}:policy\\/[\\w+=,.@\\-\\/]*[\\w+=,.@\\-]+$"
-    ConstraintDescription: "Must be empty or a valid IAM Policy ARN in the format: arn:aws:iam::{account_id}:policy/{policy_name}"
 
   # ---------------------------------------------------------------------------
   # Lambda Function Settings
