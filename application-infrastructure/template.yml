@@ -157,7 +157,6 @@ Parameters:
       - "Linear10PercentEvery10Minutes"
       - "AllAtOnce" # All at once. Recommended only for TEST and DEV environments.
 
-
   AlarmNotificationEmail:
     Type: String
     Description: "Email address to send notifications to when alarms are triggered. Be sure to check the inbox as you will need to confirm the subscription."
@@ -176,10 +175,11 @@ Parameters:
 
   FunctionMaxMemoryInMB:
     Type: Number
-    Description: "If you are handling large responses, you will need to increase the size. Monitor CloudWatch logs"
-    Default: 128
-    AllowedValues: [128, 192, 256, 320, 384, 448, 512]
-    ConstraintDescription: "Min 128, Max 512 in increments of 64"
+    Description: "If you are handling large responses, you will need to increase the size. Monitor CloudWatch logs. 1024 MB is a good starting point for most API web service applications."
+    Default: 1024 # 1 GB
+    MinValue: 128
+    MaxValue: 10240 # 10 GB
+    ConstraintDescription: "Must be between 128 and 1024 MB (10 GB). 1024 MB is a good starting point for most API web service applications."
 
   FunctionArchitecture:
     Type: String
@@ -307,7 +307,7 @@ Resources:
       PropagateTags: True
 
       VersionDescription: "Development Stages"
-      AutoPublishCodeSha256: "20250226T0936" # Hash This To Overcome AliasLive Update Errors - Undocumented AWS bug workaround
+      AutoPublishCodeSha256: "20250527T0936" # Hash This To Overcome AliasLive Update Errors - Undocumented AWS bug workaround
       AutoPublishAlias: live
       DeploymentPreference:
         Enabled: !If [ IsProduction, True,  False] # Gradual deployment only if in production so DEV and TEST aren't hindered
