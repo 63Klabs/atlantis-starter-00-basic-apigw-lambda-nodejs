@@ -13,10 +13,24 @@ phases:
 
       - ls -l -a
 
+      - python --version
+      - echo "NODE_ENV is $NODE_ENV"
+
+      # Configure pip cache directory
+      - mkdir -p /root/.cache/pip
+      - pip config set global.cache-dir /root/.cache/pip
+
       # Upgrade AWS CLI to the latest version
       - pip install --upgrade awscli
 
-      - python --version
+      # Install Python dependencies for Build Scripts if requirements.txt exists
+      - |
+        if [ -f "build-scripts/requirements.txt" ]; then
+          echo "Installing Python dependencies for build scripts"
+          pip install -r build-scripts/requirements.txt
+        else
+          echo "No build-scripts/requirements.txt found, skipping pip install"
+        fi
 
       # Set npm caching (This 'offline' cache is still tar zipped, but it helps.) - https://blog.mechanicalrock.io/2019/02/03/monorepos-aws-codebuild.html
       - npm config -g set prefer-offline true
@@ -25,9 +39,6 @@ phases:
 
   pre_build:
     commands:
-
-      # Display the current value of NODE_ENV
-      - echo "NODE_ENV is $NODE_ENV"
       
       # Install dependencies needed for application
       - ls -l -a
@@ -65,3 +76,4 @@ artifacts:
 cache:
   paths:
     - '/root/.npm/**/*'
+    - '/root/.cache/pip/**/*'
