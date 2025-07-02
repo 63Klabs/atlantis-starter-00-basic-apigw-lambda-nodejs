@@ -11,6 +11,7 @@
     "Function": "web-service",
 
     "Provisioner": "CloudFormation",
+    "DeployedUsing": "CodePipeline",
     "Atlantis": "application-infrastructure",
     "atlantis:Prefix": "$PREFIX$",
     "atlantis:Application": "$PREFIX$-$PROJECT_ID$",
