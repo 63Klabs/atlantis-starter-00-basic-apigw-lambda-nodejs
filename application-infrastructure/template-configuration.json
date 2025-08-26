@@ -1,6 +1,7 @@
 {
   "Parameters": {
-    "ApiPathBase": "$PROJECT_ID$-$STAGE_ID$"
+    "ApiPathBase": "$PROJECT_ID$-$STAGE_ID$",
+    "ApiGatewayLoggingEnabled": "FALSE"
   },
   "Tags": {
     "Name": "Hello World Web Service API $PREFIX$-$PROJECT_ID$",
