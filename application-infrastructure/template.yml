@@ -189,7 +189,7 @@ Parameters:
     AllowedValues: ["x86_64", "arm64"]
 
   # ---------------------------------------------------------------------------
-  # Application Settings
+  # Application Parameters
 
   ApiPathBase:
     Type: String
@@ -305,7 +305,7 @@ Resources:
     DeletionPolicy: !If [IsProduction, Retain, Delete]
     UpdateReplacePolicy: Retain
     Properties:
-      LogGroupName: !Sub '/aws/apigateway/${Prefix}-${ProjectId}-${StageId}-WebApi-execution-logs'  # <-- consistent naming | aws default --> 'API-Gateway-Execution-Logs_${WebApi}/${ApiPathBase}'
+      LogGroupName: !Sub 'API-Gateway-Execution-Logs_${WebApi}/${ApiPathBase}' # AWS default
       RetentionInDays: !If [ IsProduction, !Ref LogRetentionInDaysForPROD,  !Ref LogRetentionInDaysForDEVTEST]
 
   # ---------------------------------------------------------------------------
@@ -463,7 +463,7 @@ Outputs:
   CloudWatchApiGatewayExecutionLogGroup:
     Condition: ApiGatewayLoggingIsEnabled
     Description: "Cloud Watch Log Group for API Gateway Execution Logs"
-    Value: !Sub "https://console.aws.amazon.com/cloudwatch/home?region=${AWS::Region}#logStream:group=%2Faws%2Fapigateway%2F${Prefix}-${ProjectId}-${StageId}-WebApi-execution-logs"
+    Value: !Sub "https://console.aws.amazon.com/cloudwatch/home?region=${AWS::Region}#logStream:group=%2Faws%2Fapigateway%2FAPI-Gateway-Execution-Logs_${WebApi}/${ApiPathBase}"
 
   CloudWatchApiGatewayAccessLogGroup:
     Condition: ApiGatewayLoggingIsEnabled
