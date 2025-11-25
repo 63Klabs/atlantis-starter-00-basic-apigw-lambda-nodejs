@@ -335,7 +335,7 @@ Resources:
 
       CodeUri: src/
       Handler: index.handler
-      Runtime: nodejs22.x # https://docs.aws.amazon.com/lambda/latest/dg/lambda-runtimes.html
+      Runtime: nodejs24.x # https://docs.aws.amazon.com/lambda/latest/dg/lambda-runtimes.html
       Architectures:
         - !Ref FunctionArchitecture # arm64 has better processing than default x86_64 - but layers and binaries must support
       Timeout: !Ref FunctionTimeOutInSeconds
