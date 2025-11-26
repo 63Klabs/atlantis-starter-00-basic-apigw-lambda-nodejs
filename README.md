@@ -9,3 +9,9 @@ A very simple example to demonstrate Atlantis Template for AWS CodePipeline to p
 ## Tutorial
 
 Read the [Atlantis Tutorials introductory page](https://github.com/63Klabs/atlantis-tutorials), then perform the steps outlined in the [Basic API Gateway with Lambda Node.js tutorial](https://github.com/63Klabs/atlantis-tutorials/tree/main/tutorials/00-basic-api-gateway-with-lambda-written-in-node).
+
+## AI Context
+
+See [AI_CONTEXT.md](AI_CONTEXT.md) for important context and guidelines for AI-generated code in this repository.
+
+The context file is also helpful (and perhaps essential) for HUMANS developing within the application's structured platform as well.
