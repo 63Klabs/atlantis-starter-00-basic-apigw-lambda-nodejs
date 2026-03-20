@@ -21,6 +21,9 @@ jobs:
         with:
           python-version: '3.11'
 
+      - name: Install metadata script dependencies
+        run: pip install requests
+
       - name: Generate sidecar metadata
         run: |
           python scripts/generate-sidecar-metadata.py \
