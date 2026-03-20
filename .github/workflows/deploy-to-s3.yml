@@ -16,6 +16,20 @@ jobs:
       - name: Checkout code
         uses: actions/checkout@v6
 
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+
+      - name: Generate sidecar metadata
+        run: |
+          python scripts/generate-sidecar-metadata.py \
+            --repo-path . \
+            --github-repo ${{ github.repository }} \
+            --github-token ${{ secrets.GITHUB_TOKEN }} \
+            --output ${{ github.event.repository.name }}.json \
+            --pretty
+
       - name: Configure AWS credentials
         uses: aws-actions/configure-aws-credentials@v6
         with:
