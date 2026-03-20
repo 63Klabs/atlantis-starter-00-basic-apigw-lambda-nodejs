@@ -9,6 +9,7 @@ phases:
   install:
     runtime-versions:
       nodejs: latest
+      python: latest
     commands:
 
       - ls -l -a
