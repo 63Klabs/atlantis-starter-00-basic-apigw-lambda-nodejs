@@ -41,5 +41,5 @@ See [Change Log](./CHANGELOG.md)
 
 ## Contributors
 
-- [63klabs](https://github.com/63klabs)
+- [63Klabs](https://github.com/63klabs)
 - [Chad Kluck](https://github.com/chadkluck)
