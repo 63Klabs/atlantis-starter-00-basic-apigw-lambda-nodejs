@@ -29,7 +29,6 @@ jobs:
           python scripts/generate-sidecar-metadata.py \
             --repo-path . \
             --github-repo ${{ github.repository }} \
-            --github-token ${{ secrets.GITHUB_TOKEN }} \
             --output ${{ github.event.repository.name }}.json \
             --pretty
 
