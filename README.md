@@ -17,6 +17,10 @@ A very simple example to demonstrate Atlantis Template for AWS CodePipeline to p
 1. Read the [Atlantis Tutorials introductory page](https://github.com/63Klabs/atlantis-tutorials)
 2. Then perform the steps outlined in the [Basic API Gateway with Lambda Node.js tutorial](https://github.com/63Klabs/atlantis-tutorials/tree/main/tutorials/00-basic-api-gateway-with-lambda-written-in-node).
 
+## Architecture
+
+See [Architecture](./ARCHITECTURE.md)
+
 ## Deployment Guide
 
 See [Deployment Guide](./DEPLOYMENT.md)
