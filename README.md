@@ -2,7 +2,7 @@
 
 A very simple example to demonstrate Atlantis Template for AWS CodePipeline to provision a web service that utilizes API Gateway and a simple Lambda function written in Node.js.
 
-| | Build/Deploy | Application |
+| | Build/Deploy | Application Stack |
 |---|---|---|
 | **Languages** | Python, Shell | Node.js |
 | **Frameworks** | Atlantis | Atlantis |
