@@ -645,6 +645,9 @@ def main():
 
     # Generate metadata
     print("Generating sidecar metadata...")
+    print(f"Repository path: {repo_path}")
+    print(f"GitHub repo: {args.github_repo}")
+)
     metadata = generate_metadata(
         repo_path=repo_path,
         github_repo=args.github_repo,
