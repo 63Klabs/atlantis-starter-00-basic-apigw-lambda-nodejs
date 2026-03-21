@@ -12,7 +12,7 @@ Follow your organization's guidelines for repository and pipeline management.
 
 ## Why Use Atlantis?
 
-Like any other project, you can skip the Atlantis platform and go at it on your own using `sam build` and `sam deploy` from the CLI within the application-infrastructure directory.
+Like any other project, you can skip the Atlantis platform and go at it on your own using `sam deploy` from the CLI within the application-infrastructure directory.
 
 However, if you are managing many projects manually (especially on your own or part of a small team), the Atlantis platform is highly recommended as it implements Platform Engineering and AWS best practices. Plus it utilizes AWS native resources including SAM deployments and CloudFormation without the need of proprietary DevOps tools. Everything is API, CloudFormation template, and SAM CLI based.
 
