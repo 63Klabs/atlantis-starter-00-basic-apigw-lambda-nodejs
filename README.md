@@ -31,7 +31,7 @@ See [Docs Directory](./docs/README.md)
 
 ## AI Context
 
-See [AGENTS.md](AGENTS.md) for important context and guidelines for AI-generated code in this repository.
+See [AGENTS.md](./AGENTS.md) for important context and guidelines for AI-generated code in this repository.
 
 The agents file is also helpful (and perhaps essential) for HUMANS developing within the application's structured platform as well.
 
