@@ -5,6 +5,7 @@
 ```
 ├── application-infrastructure/    # AWS SAM application stack
 │   ├── build-scripts/             # Python scripts used during CodeBuild
+│   │   ├── generate-put-ssm.py
 │   │   ├── update_template_configuration.py
 │   │   └── update_template_timestamp.py
 │   ├── src/                       # Lambda function source code (Node.js)
