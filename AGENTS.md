@@ -28,11 +28,11 @@ Applications deployed via this repository follow the Golden Path for cloud devel
 
 Shared templates for S3, DynamoDB, caching, networking (CloudFront/Route53), and pipelines come from:
 
-* **Atlantis Platform Template Repo:** [https://github.com/63Klabs/atlantis-cfn-template-repo-for-serverless-deployments](https://github.com/63Klabs/atlantis-cfn-template-repo-for-serverless-deployments)
+* **Atlantis Platform Template Repo:** [https://github.com/63Klabs/atlantis-sam-templates](https://github.com/63Klabs/atlantis-sam-templates)
 
 Scripts for configuring and Deploying automated CodePipeline stacks come from:
 
-* **Atlantis SAM Configuration Repo:** [https://github.com/63Klabs/atlantis-cfn-configuration-repo-for-serverless-deployments](https://github.com/63Klabs/atlantis-cfn-configuration-repo-for-serverless-deployments)
+* **Atlantis SAM Configuration Repo:** [https://github.com/63Klabs/atlantis-sam-config-scripts](https://github.com/63Klabs/atlantis-sam-config-scripts)
 
 The organization deploying the application is reponsible for their own organizion-wide copy of a SAM configuration repository. The SAM Config repository manages `samconfig` files and deployed infrastructure using scripts, expanding the capabilities of `sam deploy`. While a `samconfig` file may be kept in this repository for development deployment, actual deployments should occur using the scripts to ensure proper tagging, resource mangement, and automation.
 
@@ -198,7 +198,13 @@ AI suggestions **must not** recommend:
 * Creating custom pipeline YAML/JSON
 * Editing CodePipeline templates
 * Using Terraform
-* Using AWS CLI, AWS CDK, AWS SDK without proper tagging and clean-up
+* Using AWS CLI, AWS CDK, AWS SDK **without** proper tagging and clean-up
+
+AWS CLI may be used to perform data update or read actions (such as Put SSM Parameter value, PutObject to S3, add record to DynamoDB, or read current state of resources). It should not be used to create or modify resources.
+
+AWS CDK may be used to perform programatic creation, update, and deletion of resources during deployment as long as it propagates tags from the environment or configuration file and has a clean-up process for when the originating application stack is deleted. TagKey:Values "Provisioner":"AWS CDK", "DeployedUsing":"AWS CDK"
+
+AWS SDK may be used to perform programatic creation, update, and deletion of resources during script  execution (including Lambda, Step Functions, etc.)  as long as it propagates tags from the environment or configuration file and has a clean-up process for when the originating application stack is deleted. TagKey:Values "Provisioner":"AWS SDK", "DeployedUsing":"AWS SDK"
 
 ## 5. Architectural Guidelines for AI-Generated Code
 
