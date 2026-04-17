@@ -200,7 +200,9 @@ AI suggestions **must not** recommend:
 * Using Terraform
 * Using AWS CLI, AWS CDK, AWS SDK **without** proper tagging and clean-up
 
-AWS CLI may be used to perform data update or read actions (such as Put SSM Parameter value, PutObject to S3, add record to DynamoDB, or read current state of resources). It should not be used to create or modify resources.
+Deployments should consider CloudFormation/SAM first.
+
+AWS CLI may be used to perform data update or read actions (such as Put SSM Parameter value, PutObject to S3, add record to DynamoDB, or read current state of resources). It should not be used to create or modify resources. Example CLI commands for the user, developer, or administrator should be documented with examples.
 
 AWS CDK may be used to perform programatic creation, update, and deletion of resources during deployment as long as it propagates tags from the environment or configuration file and has a clean-up process for when the originating application stack is deleted. TagKey:Values "Provisioner":"AWS CDK", "DeployedUsing":"AWS CDK"
 
