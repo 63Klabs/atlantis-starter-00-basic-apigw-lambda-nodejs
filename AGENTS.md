@@ -186,7 +186,7 @@ AI-generated deployment instructions must follow this workflow.
 * Conditional logic should be built into the template and any environment variables based on the Deployment Environment (TEST/PROD)
 * Tests, Builds, and Deployment must be automated and provided in the buildspec.yml file used by the Pipeline.
 * A `samconfig` file local to the application's repository may only be used for development purposes.
-* CloudFormation stacks deployed by SAM are the first choice. If complex or programmatic logic requires the use of AWS CDK or AWS SDK, the CDK MUST manage BOTH deployment and a clean tear down. The CDK MUST also include the tags (resolving any placeholders) found in `application-infrastructure/template-configuration.json`. (See the `application-infrastructure/build-scripts/update_template_configuration.py` script for an example of how placeholders are resolved from environment variables.)
+* CloudFormation stacks deployed by SAM are the first choice. If complex or programmatic logic requires the use of AWS CDK or AWS SDK, the SDK or CDK MUST manage BOTH deployment and a clean tear down. The SDK or CDK MUST also include the tags (resolving any placeholders) found in `application-infrastructure/template-configuration.json`. (See the `application-infrastructure/build-scripts/update_template_configuration.py` script for an example of how placeholders are resolved from environment variables.)
 * AWS CLI commands may be provided as instructions to:
   * Copy files to S3
   * Set SSM Parameters
@@ -199,14 +199,6 @@ AI suggestions **must not** recommend:
 * Editing CodePipeline templates
 * Using Terraform
 * Using AWS CLI, AWS CDK, AWS SDK **without** proper tagging and clean-up
-
-Deployments should consider CloudFormation/SAM first.
-
-AWS CLI may be used to perform data update or read actions (such as Put SSM Parameter value, PutObject to S3, add record to DynamoDB, or read current state of resources). It should not be used to create or modify resources. Example CLI commands for the user, developer, or administrator should be documented with examples.
-
-AWS CDK may be used to perform programatic creation, update, and deletion of resources during deployment as long as it propagates tags from the environment or configuration file and has a clean-up process for when the originating application stack is deleted. TagKey:Values "Provisioner":"AWS CDK", "DeployedUsing":"AWS CDK"
-
-AWS SDK may be used to perform programatic creation, update, and deletion of resources during script  execution (including Lambda, Step Functions, etc.)  as long as it propagates tags from the environment or configuration file and has a clean-up process for when the originating application stack is deleted. TagKey:Values "Provisioner":"AWS SDK", "DeployedUsing":"AWS SDK"
 
 ## 5. Architectural Guidelines for AI-Generated Code
 
