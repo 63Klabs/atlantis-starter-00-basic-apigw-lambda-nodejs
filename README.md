@@ -39,6 +39,10 @@ The agents file is also helpful (and perhaps essential) for HUMANS developing wi
 
 See [Change Log](./CHANGELOG.md)
 
+## Security
+
+See [Security](./SECURITY.md)
+
 ## Contributors
 
 - [63Klabs](https://github.com/63klabs)
