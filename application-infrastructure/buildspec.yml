@@ -39,6 +39,8 @@ phases:
       - npm config -g set cache /root/.npm
       - npm config get cache
 
+      - cd "$CODEBUILD_SRC_DIR/application-infrastructure"
+
       # Build Environment: Install Python dependencies for Build Scripts if build-scripts/requirements.txt exists
       - |
         if [ -f "build-scripts/requirements.txt" ]; then
@@ -50,10 +52,12 @@ phases:
 
   pre_build:
     commands:
-      
+
+      - cd "$CODEBUILD_SRC_DIR/application-infrastructure"
+
       # Application Environment: Install NPM dependencies needed for application environment
       - ls -l -a
-      - cd application-infrastructure/src
+      - cd "$CODEBUILD_SRC_DIR/application-infrastructure/src"
       - npm install --production
 
       # FAIL the build if npm audit has vulnerabilities it can't fix
@@ -62,13 +66,15 @@ phases:
       - npm audit --audit-level=high
       
       # Go back to application-infrastructure directory
-      - cd ..
+      - cd "$CODEBUILD_SRC_DIR/application-infrastructure"
 
       # Create a parameter in SSM Parameter store if it does not yet exist:
       - python3 ./build-scripts/generate-put-ssm.py ${PARAM_STORE_HIERARCHY}ExampleParameter
       
   build:
     commands:
+
+      - cd "$CODEBUILD_SRC_DIR/application-infrastructure"
 
       # There is sometimes a bug that causes the alias to not be updated correctly (see comment in template.yml for AppFunction.Properties.AutoPublishCodeSha256)
       - python3 ./build-scripts/update_template_timestamp.py template.yml
