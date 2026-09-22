@@ -33,7 +33,11 @@ Using the Atlantis SAM Config scripts in your organization's central infrastruct
 ./cli/deploy.py pipeline PREFIX YOUR_PROJECT_ID test
 ```
 
-Clone the repository to your local machine and perform your first merge:
+Once the pipeline is created the first deployment will automatically kick off. You can follow it in the web console using the link provided in the Output.
+
+Make sure it deploys without errors before going to the `dev` branch and making changes.
+
+Clone the repository to your local machine:
 
 ```bash
 git clone HTTPS_CLONE_URL
@@ -41,12 +45,7 @@ git clone HTTPS_CLONE_URL
 cd YOUR_CLONED_REPO
 
 git switch dev
-git switch test
-git merge dev
-git push
 ```
-
-This will now kick off your first deployment. Make sure it deploys without errors before going back to `dev` and making changes.
 
 ## Development and Deploy Process
 
@@ -79,6 +78,10 @@ git switch dev
 ### Setting Up Pipelines
 
 For each branch you wish to deploy from, set up a pipeline using your organization's central Atlantis SAM Config repository.
+
+There are several pipeline configurations to choose from. If you prefer to not use the branch merge strategy (`dev` -> `test` -> `beta` -> `main`) you can configure the pipeline to use an approval and promotion strategy instead. Cross account configuration is also available.
+
+All Atlantis pipeline templates support approval with promotion and cross-account.
 
 ```bash
 # Create a pipeline for the test branch
