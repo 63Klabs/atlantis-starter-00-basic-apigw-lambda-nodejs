@@ -1,6 +1,6 @@
 # Basic API Gateway with Lambda Function Written in Node.js
 
-A very simple example to demonstrate Atlantis Template for AWS CodePipeline to provision a web service that utilizes API Gateway and a simple Lambda function written in Node.js.
+A very simple example to demonstrate Atlantis Template for AWS CodePipeline to provision an example web service that utilizes API Gateway and a simple Lambda function written in Node.js. API Gateway can be replaced with any event emitter (schedule, S3, etc.) and the Lambda function code can be replaced with any functionality.
 
 | | Build/Deploy | Application Stack |
 |---|---|---|
